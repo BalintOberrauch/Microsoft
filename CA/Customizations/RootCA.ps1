@@ -53,23 +53,6 @@ function LogWrite {
     $logString | Out-File -FilePath $LogFilePath -Append
 }
 
-param (
-    [string]$AiaFqdn,
-    [switch]$Custom,
-    [switch]$Verbose,
-    [string]$LogPath
-)
-
-# Initialize logging
-$LogFilePath = if ($LogPath) { $LogPath } else { Join-Path $env:TEMP "CAConfigLog.txt" }
-function LogWrite {
-    Param ([string]$logString)
-    if ($Verbose) {
-        Write-Host $logString
-    }
-    $logString | Out-File -FilePath $LogFilePath -Append
-}
-
 LogWrite "Starting CA configuration script."
 
 # Always prompt for DSConfigDN
@@ -123,5 +106,14 @@ certutil -setreg CA\CACertPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnr
 
 Write-Host -ForegroundColor Green "Confirm your settings"
 certutil -getreg CA\CACertPublicationURLs
+
+
+Write-Host -ForegroundColor Green "Restarting the services"
+
+Restart-Service certsvc -Verbose
+
+Write-Host -ForegroundColor Green "Publish your CRL"
+
+certutil -crl
 
 LogWrite "Script execution completed."

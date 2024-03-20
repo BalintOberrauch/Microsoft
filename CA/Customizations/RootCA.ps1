@@ -34,7 +34,6 @@
     Date: 19/03/2024
 #>
 
-
 param (
     [string]$AiaFqdn,
     [switch]$Custom,
